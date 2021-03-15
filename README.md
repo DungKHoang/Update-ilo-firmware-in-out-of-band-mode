@@ -3,7 +3,7 @@
 
 ## Notes
    * Access iLO from OneView
-   * Works only for **iLO5 with Authentcation token key**. 
+   * Works only for **iLO5 with Authentication token key**. 
 
 
 ## How to get Support
