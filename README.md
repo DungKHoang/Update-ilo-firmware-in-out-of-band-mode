@@ -1,4 +1,4 @@
-# Upodate iLO fiwrmware in Out-of-band mode
+# Update iLO fiwrmware in Out-of-band mode
   The script enables you to update iLO firmware of servers in iLO where the iLO firmware version is lower than 2.00
 
 ## Notes
