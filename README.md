@@ -7,7 +7,7 @@
 
 
 ## How to get Support
-Simple scripts or tools posted on github are provided AS-IS and support is absed on best effort provided by the author. If you encunter problems with the script, please submit an issue 
+Simple scripts or tools posted on github are provided AS-IS and support is based on best effort provided by the author. If you encounter problems with the script, please submit an issue.
 
 ## Prerequisites
 The script requires:
@@ -30,7 +30,9 @@ The script requires:
 
 ```
     # ONLY for iLO 5
-    .\update-iLO-firmware.ps1 -hostname <OV-name> -username <OV-admin> -password <OV-password> -iloFWlocation c:\ilo5.bin -minFWversion '2.00'
+    .\OV-update-iLO-firmware.ps1 -hostname <OV-name> -username <OV-admin> -password <OV-password> -iloFWlocation c:\ilo5.bin -minFWversion '2.00'
+    # For POSH v 5.2
+    .\HPOV-update-iLO-firmware.ps1 -hostname <OV-name> -username <OV-admin> -password <OV-password> -iloFWlocation c:\ilo5.bin -minFWversion '2.00'
 
 ```
 

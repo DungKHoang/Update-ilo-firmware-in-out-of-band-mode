@@ -13,6 +13,7 @@ Param (
 
 
 if ($hostName -or $userName -or $password)
+{
     ### Connect to OneView
     $securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
     $cred           = New-Object System.Management.Automation.PSCredential  -ArgumentList $userName, $securePassword
@@ -35,7 +36,7 @@ if ($hostName -or $userName -or $password)
             $iloIP              = $s.mpHostInfo.mpIpAddresses[0].address
             
 
-            write-host -foregraound CYAN "Updating iLO firmware of server $serverName...."
+            write-host -foreground CYAN "Updating iLO firmware of server $serverName...."
             #### Connect to iLO
             # Using AuthToken works ONLY for iLO5
 
@@ -46,10 +47,10 @@ if ($hostName -or $userName -or $password)
     }
     else
     {
-        write-host -foreground YELLOW 'No server with iLO firmware lower than 2.00. Spkip updating iLO FW.....'
+        write-host -foreground YELLOW "No server with iLO firmware lower than $minFWversion. Spkip updating iLO FW....."
     }
 }
 else
 {
-    No OneView IP nor userName nor password specified. Exit the script
+    write-host -foreground YELLOW "No OneView IP nor userName nor password specified. Exit the script"
 }
