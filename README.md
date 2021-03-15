@@ -23,6 +23,7 @@ The script requires:
 ```
     install-module HPEOneView.5xx  -scope currentuser
     install-Module HPEiLOcmdlets   -scope currentuser
+    install-module ImportExcel     -scope CurrentUser
     
 
 ```
