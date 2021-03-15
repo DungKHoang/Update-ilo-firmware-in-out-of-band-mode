@@ -13,6 +13,7 @@ Simple scripts or tools posted on github are provided AS-IS and support is based
 The script requires:
    * the latest OneView PowerShell library on PowerShell gallery
    * the latest HPEiLOCmdelts on PowerShell gallery
+   * ImportExcel module from PowerShell gallery
    * Download the latest iLO firmware to a local folder
 
   
@@ -26,11 +27,21 @@ The script requires:
 
 ```
 
-## To run in an OneView environment
+## To get list of servers with ilo Firmware
+```
+    # For POSH version greater than 5.3
+    .\OV-update-iLO-firmware.ps1 -hostname <OV-name> -username <OV-admin> -password <OV-password> -minFWversion '2.00' -query
+    # For POSH v 5.2
+
+    .\HPOV-update-iLO-firmware.ps1 -hostname <OV-name> -username <OV-admin> -password <OV-password> -minFWversion '2.00' -query
 
 ```
-    # ONLY for iLO 5
+## To update iLO firmware on list of servers
+
+```
+    # For POSH version greater than 5.3
     .\OV-update-iLO-firmware.ps1 -hostname <OV-name> -username <OV-admin> -password <OV-password> -iloFWlocation c:\ilo5.bin -minFWversion '2.00'
+
     # For POSH v 5.2
     .\HPOV-update-iLO-firmware.ps1 -hostname <OV-name> -username <OV-admin> -password <OV-password> -iloFWlocation c:\ilo5.bin -minFWversion '2.00'
 
