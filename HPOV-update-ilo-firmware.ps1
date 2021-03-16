@@ -10,6 +10,9 @@ Param (
       )
 
 
+
+
+
 class server
 {
     [string]$name
@@ -21,14 +24,11 @@ class server
 
 function writeto-Excel($data, $sheetName, $destWorkbook)
 {
-	if ($destWorkBook)
-	{
-		if ($data )
-		{
-			
-			$data | Export-Excel -path $destWorkBook  -StartRow $startRow -WorksheetName $sheetName
-		}
-	}
+    if ($destWorkBook -and $data)
+    {
+            
+        $data | Export-Excel -path $destWorkBook  -WorksheetName $sheetName
+    }
 }
 
 
@@ -37,7 +37,7 @@ function writeto-Excel($data, $sheetName, $destWorkbook)
 # --------------------------
 $sheetName          = "Server with iLO FW"
 $destWorkBook       = "Server-with-ilo-FW.xlsx"
-$startRow           = 1
+
 
 if ($hostName -or $userName -or $password)
 {
@@ -48,12 +48,12 @@ if ($hostName -or $userName -or $password)
 
 
     write-host -ForegroundColor Cyan "---- Connecting to OneView --> $hostName"
-    $OVconnection   = Connect-hpovMgmt -Hostname $hostName -loginAcknowledge:$true -AuthLoginDomain $authLoginDomain -Credential $cred
+    $OVconnection   = Connect-HPOVMgmt -Hostname $hostName -loginAcknowledge:$true -AuthLoginDomain $authLoginDomain -Credential $cred
 
 
 
     # ----------------- Get list of servers whose iLO FW  less than 2.00
-    $serverList                 = Get-hpovserver 
+    $serverList                 = Get-HPOVserver  | where generation -eq 'Gen10'
     if ($serverList)
     {
         if (test-path $destWorkBook)
@@ -77,12 +77,11 @@ if ($hostName -or $userName -or $password)
                     $sObj.iloFirmware       = $s.mpFirmwareVersion
                     $sObj.serialNumber      = $s.serialNumber
                     $ValuesArray 	        += $sObj
-                    $serverName , $iloFW
                 }
                 else
                 {
 
-                    $iloSession         = $s | Get-hpoviloSso -IloRestSession
+                    $iloSession         = $s | Get-HPOViloSso -IloRestSession
                     $authToken          = $iloSession.'X-Auth-Token'
                     
                     

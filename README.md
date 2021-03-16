@@ -1,5 +1,5 @@
 # Update iLO firmware in Out-of-band mode
-  The script enables you to update iLO firmware of servers in iLO where the iLO firmware version is lower than 2.00
+  The script enables you to update iLO firmware of Gen 10 servers when the firmware version is lower than 2.00
 
 ## Notes
    * Access iLO from OneView
