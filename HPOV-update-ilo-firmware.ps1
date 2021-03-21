@@ -91,7 +91,7 @@ if ($hostName -or $userName -or $password)
                     # Using AuthToken works ONLY for iLO5
 
                     $iLOConnection      = Connect-HPEiLO -Address $iloIP -XAuthToken $authToken -DisableCertificateAuthentication
-                    Update-HPEiLOFirmware -Connection $iLOConnection -Location $iloFWlocation  -UploadTimeout 700
+                    Update-HPEiLOFirmware -Connection $iLOConnection -Location $iloFWlocation  -UploadTimeout 700 -confitm:$False -UpdateRepository
                 }
             }
         }
