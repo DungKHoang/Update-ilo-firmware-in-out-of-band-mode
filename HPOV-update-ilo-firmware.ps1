@@ -5,7 +5,7 @@ Param (
         [string]$password                  = "",
         [string]$authLoginDomain           = "local",
         [string]$minFWversion              = '2.00',
-        [string]$iloFWlocation             = "C:\Users\admin\Desktop\Firmware\ilo5.bin",
+        [string]$iloFWlocationUri             ,
         [switch]$query                                                                      # if specified , then only list of servers 
       )
 
