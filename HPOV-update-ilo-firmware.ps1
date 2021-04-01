@@ -21,6 +21,23 @@ class server
     [string]$iloFirmware
 }
 
+## -------- Workaround for diabling Security certificate
+add-type @"
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+public class TrustAllCertsPolicy : ICertificatePolicy {
+    public bool CheckValidationResult(
+        ServicePoint srvPoint, X509Certificate certificate,
+        WebRequest request, int certificateProblem) {
+        return true;
+    }
+}
+"@
+[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Ssl3, [Net.SecurityProtocolType]::Tls, [Net.SecurityProtocolType]::Tls11, [Net.SecurityProtocolType]::Tls12
+
+## -------- End Workaround for diabling Security certificate
+
 
 function writeto-Excel($data, $sheetName, $destWorkbook)
 {
@@ -31,6 +48,33 @@ function writeto-Excel($data, $sheetName, $destWorkbook)
     }
 }
 
+function update_firmware($authToken, $iloIP, $iloFWlocationUri)
+{
+
+    # ---- Build headers
+    $headers = @{}
+    $headers.Add('X-Auth-Token', $authToken)
+    $headers.add('Content-Type','application/json')
+    $headers.add('OData-Version','4.0')
+
+    # ----- Build fw location
+    $fwJSON             = "{ `n  `"ImageURI`" : `"$iloFWlocationUri`" `n} `n "
+    
+    # Locate the FW simpleUpdate Action
+    $updateService      = Invoke-RestMethod -Method GET -Headers $headers -uri "http://$iloIP/redfish/v1/UpdateService"
+    $target             = $updateService.actions.'#UpdateService.SimpleUpdate'.target
+    $targetUri          = "http://$iloIP$target"
+
+    # ---- Perform FW update by POST
+    $ret                = Invoke-RestMethod -Method POST -Uri $targetUri -Headers $headers -Body $fwJSON
+    $msg                = $ret.error.'@Message.ExtendedInfo'.MessageId
+
+    write-host -ForegroundColor CYAN " Update FW on ilo $iloIP ----> status is $msg"
+
+
+
+}
+
 
 # --------------------------
 # Main Entry
@@ -38,6 +82,7 @@ function writeto-Excel($data, $sheetName, $destWorkbook)
 $sheetName          = "Server with iLO FW"
 $destWorkBook       = "Server-with-ilo-FW.xlsx"
 
+$ipv4Format         = '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
 
 if ($hostName -or $userName -or $password)
 {
@@ -64,8 +109,13 @@ if ($hostName -or $userName -or $password)
         foreach ($s in $serverList)
         {
             $serverName                 = $s.Name 
-            $iloIP                      = $s.mpHostInfo.mpIpAddresses[1].address
+            foreach ($a in $s.mpHostInfo.mpIpAddresses)
+            {
+                $iloIP                  = if ($a.address -match $ipv4Format) {$a.address} else {''}
+            }
+
             $iloFW                      = $s.mpFirmwareVersion.Split(' ')[0]
+
             if ($iloFW -le $minFWversion)
             {
 
@@ -83,15 +133,17 @@ if ($hostName -or $userName -or $password)
 
                     $iloSession         = $s | Get-HPOViloSso -IloRestSession
                     $authToken          = $iloSession.'X-Auth-Token'
+        
+                    if ( ($iloIP) -and ($iloFWlocationUri -like 'http*'))
+                    {
+                        write-host -foreground CYAN "Updating iLO firmware of server $serverName ...."
+                        update_firmware -authToken $authToken -iloIP $iloIP -iloFWlocationUri $iloFWlocationUri
+                    }
+                    else 
+                    {
+                        write-host -foreground YELLOW "check ilo IP ---> $iloIP or fw Location URi ---> $iloFWlocationUri"
+                    }
                     
-                    
-
-                    write-host -foreground CYAN "Updating iLO firmware of server $serverName...."
-                    #### Connect to iLO
-                    # Using AuthToken works ONLY for iLO5
-
-                    $iLOConnection      = Connect-HPEiLO -Address $iloIP -XAuthToken $authToken -DisableCertificateAuthentication
-                    Update-HPEiLOFirmware -Connection $iLOConnection -Location $iloFWlocation  -UploadTimeout 700 -confitm:$False -UpdateRepository
                 }
             }
         }

@@ -1,9 +1,6 @@
 # Update iLO firmware in Out-of-band mode
   The script enables you to update iLO firmware of Gen 10 servers when the firmware version is lower than 2.00
 
-## Notes
-   * Access iLO from OneView
-   * Works only for **iLO5 with Authentication token key**. 
 
 
 ## How to get Support
@@ -12,17 +9,17 @@ Simple scripts or tools posted on github are provided AS-IS and support is based
 ## Prerequisites
 The script requires:
    * the latest OneView PowerShell library on PowerShell gallery
-   * the latest HPEiLOCmdelts on PowerShell gallery
    * ImportExcel module from PowerShell gallery
-   * Download the latest iLO firmware to a local folder
+   * Download the latest iLO firmware to a web location
 
-  
+ ## Notes
+   * The ilo FW binaries should be located in a http virtual directory for instance http://<webIP>/iloFW 
+   * The script uses the Uri to locate the FW Image, for instance http://<webIP>/iloFW/il5.bin
 
-## To install OneView PowerShell library and HPEiLOCmdlets
+## To install OneView PowerShell library
 
 ```
     install-module HPEOneView.5xx  -scope currentuser
-    install-Module HPEiLOcmdlets   -scope currentuser
     install-module ImportExcel     -scope CurrentUser
     
 
@@ -32,8 +29,8 @@ The script requires:
 ```
     # For POSH version greater than 5.3
     .\OV-update-iLO-firmware.ps1 -hostname <OV-name> -username <OV-admin> -password <OV-password> -minFWversion '2.00' -query
-    # For POSH v 5.2
 
+    # For POSH v 5.2
     .\HPOV-update-iLO-firmware.ps1 -hostname <OV-name> -username <OV-admin> -password <OV-password> -minFWversion '2.00' -query
 
 ```
@@ -41,10 +38,10 @@ The script requires:
 
 ```
     # For POSH version greater than 5.3
-    .\OV-update-iLO-firmware.ps1 -hostname <OV-name> -username <OV-admin> -password <OV-password> -iloFWlocation c:\ilo5.bin -minFWversion '2.00'
+    .\OV-update-iLO-firmware.ps1 -hostname <OV-name> -username <OV-admin> -password <OV-password>       -iloFWlocationUri http://<iloIP>/iloFW/ilo5.bin -minFWversion '2.00'
 
     # For POSH v 5.2
-    .\HPOV-update-iLO-firmware.ps1 -hostname <OV-name> -username <OV-admin> -password <OV-password> -iloFWlocation c:\ilo5.bin -minFWversion '2.00'
+    .\HPOV-update-iLO-firmware.ps1 -hostname <OV-name> -username <OV-admin> -password <OV-password>     -iloFWlocationUri http://<iloIP>/iloFW/ilo5.bin -minFWversion '2.00'
 
 ```
 
