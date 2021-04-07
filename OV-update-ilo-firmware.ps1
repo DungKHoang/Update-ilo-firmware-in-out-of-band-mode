@@ -51,9 +51,9 @@ function update_firmware($authToken, $iloIP, $iloFWlocationUri)
 
     # ---- Perform FW update by POST
     $ret                = invoke-RestMethod -SkipCertficateCheck -Method POST -Uri $targetUri -Headers $headers -Body $fwJSON
-    $msg                = $ret.error.'@Message.ExtendedInfo'.MessageId
+    #$msg                = $ret.error.'@Message.ExtendedInfo'.MessageId
 
-    write-host -ForegroundColor CYAN " Update FW on ilo $iloIP ----> status is $msg"
+    write-host -ForegroundColor CYAN " Update FW on ilo $iloIP "
 
 
 
