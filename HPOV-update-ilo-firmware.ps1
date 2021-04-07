@@ -21,22 +21,7 @@ class server
     [string]$iloFirmware
 }
 
-## -------- Workaround for diabling Security certificate
-add-type @"
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
-public class TrustAllCertsPolicy : ICertificatePolicy {
-    public bool CheckValidationResult(
-        ServicePoint srvPoint, X509Certificate certificate,
-        WebRequest request, int certificateProblem) {
-        return true;
-    }
-}
-"@
-[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Ssl3, [Net.SecurityProtocolType]::Tls, [Net.SecurityProtocolType]::Tls11, [Net.SecurityProtocolType]::Tls12
 
-## -------- End Workaround for diabling Security certificate
 
 
 function writeto-Excel($data, $sheetName, $destWorkbook)
@@ -61,12 +46,12 @@ function update_firmware($authToken, $iloIP, $iloFWlocationUri)
     $fwJSON             = "{ `n  `"ImageURI`" : `"$iloFWlocationUri`" `n} `n "
     
     # Locate the FW simpleUpdate Action
-    $updateService      = Invoke-RestMethod -Method GET -Headers $headers -uri "http://$iloIP/redfish/v1/UpdateService"
+    $updateService      = invoke-RestMethod -SkipCertficateCheck -Method GET -Headers $headers -uri "http://$iloIP/redfish/v1/UpdateService"
     $target             = $updateService.actions.'#UpdateService.SimpleUpdate'.target
     $targetUri          = "http://$iloIP$target"
 
     # ---- Perform FW update by POST
-    $ret                = Invoke-RestMethod -Method POST -Uri $targetUri -Headers $headers -Body $fwJSON
+    $ret                = invoke-RestMethod -SkipCertficateCheck -Method POST -Uri $targetUri -Headers $headers -Body $fwJSON
     $msg                = $ret.error.'@Message.ExtendedInfo'.MessageId
 
     write-host -ForegroundColor CYAN " Update FW on ilo $iloIP ----> status is $msg"
