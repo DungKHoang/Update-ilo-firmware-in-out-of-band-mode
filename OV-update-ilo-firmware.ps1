@@ -45,15 +45,15 @@ function update_firmware($authToken, $iloIP, $iloFWlocationUri)
     $fwJSON             = "{ `n  `"ImageURI`" : `"$iloFWlocationUri`" `n} `n "
     
     # Locate the FW simpleUpdate Action
-    $updateService      = invoke-RestMethod -SkipCertficateCheck -Method GET -Headers $headers -uri "http://$iloIP/redfish/v1/UpdateService"
+    $updateService      = invoke-RestMethod -SkipCertificateCheck -Method GET -Headers $headers -uri "http://$iloIP/redfish/v1/UpdateService"
     $target             = $updateService.actions.'#UpdateService.SimpleUpdate'.target
     $targetUri          = "http://$iloIP$target"
 
     # ---- Perform FW update by POST
-    $ret                = invoke-RestMethod -SkipCertficateCheck -Method POST -Uri $targetUri -Headers $headers -Body $fwJSON
-    #$msg                = $ret.error.'@Message.ExtendedInfo'.MessageId
+    $ret                = invoke-RestMethod -SkipCertificateCheck -Method POST -Uri $targetUri -Headers $headers -Body $fwJSON
+    $msg                = $ret.error.'@Message.ExtendedInfo'.MessageId
 
-    write-host -ForegroundColor CYAN " Update FW on ilo $iloIP "
+    write-host -ForegroundColor CYAN " Update FW on ilo $iloIP ---> Status is $msg "
 
 
 
@@ -100,7 +100,7 @@ if ($hostName -or $userName -or $password)
 
             $iloFW                      = $s.mpFirmwareVersion.Split(' ')[0]
 
-            if ($iloFW -le $minFWversion)
+            if ($iloFW -le "$minFWversion*")
             {
 
                 if ($query)
